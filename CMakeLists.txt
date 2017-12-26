@@ -43,11 +43,20 @@
 # THE SOFTWARE.
 #
 
+cmake_minimum_required(VERSION 3.2)
+
+include("cmake/HunterGate.cmake")
+HunterGate(
+    URL "https://github.com/ruslo/hunter/archive/v0.19.213.tar.gz"
+    SHA1 "59b2b880178bdc1e9cce83f279f1d88feefa07a2"
+)
+
+project(SDL2)
+
 # Urho3D - commented out in-source tree build prevention as Urho3D supports both out-of-source and in-source tree builds
 
 # Urho3D - commented out setting SDL2 as project name as we want SDL sub-library to remain within Urho3D "umbrella" project
 #          instead, just enable the required language support and set the extra variables associated with project() command
-enable_language (C)
 set (SDL2_SOURCE_DIR ${CMAKE_CURRENT_SOURCE_DIR})
 set (SDL2_BINARY_DIR ${CMAKE_CURRENT_BINARY_DIR})
 include(CheckFunctionExists)
