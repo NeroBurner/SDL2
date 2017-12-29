@@ -51,7 +51,7 @@ HunterGate(
     SHA1 "59b2b880178bdc1e9cce83f279f1d88feefa07a2"
 )
 
-project(SDL2)
+project(SDL2 VERSION 2.0.4)
 
 # Urho3D - commented out in-source tree build prevention as Urho3D supports both out-of-source and in-source tree builds
 
@@ -1396,22 +1396,98 @@ endif (NOT SDL_INFO_ECHOED_STATUS)
 # Ensure that the extra cflags are used at compile time
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} ${EXTRA_CFLAGS}")
 
-# Urho3D - commented out targets defined by original CMakeLists.txt, instead we setup our own target that meets our own needs
+add_library(SDL2 ${SOURCE_FILES})
+target_include_directories(
+    SDL2
+    PUBLIC
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/generated>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
+)
 
-# Urho3D - anything below this line is Urho3D specific
+if(WIN32)
+  set(SDLMAIN_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/main/windows/SDL_windows_main.c)
+else()
+  set(SDLMAIN_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/main/dummy/SDL_dummy_main.c)
+endif()
 
-# Define target name
-set (TARGET_NAME SDL)
+add_library(SDL2main ${SDLMAIN_SOURCES})
+target_link_libraries(SDL2main PUBLIC SDL2)
 
-# Setup target as STATIC library (as the result we never use EXTRA_LDFLAGS linker flags)
-setup_library ()
+# Installation (https://github.com/forexample/package-example) {
 
-# Install headers for building and using the Urho3D library (install dependency for D3D9GraphicsImpl.h, OGLGraphicsImpl.h, InputEvents.h, File.h, and Cursor.h)
-install_header_files (DIRECTORY include/ DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h USE_FILE_SYMLINK)    # Note: the trailing slash is significant
-install_header_files (FILES ${SDL2_BINARY_DIR}/include/generated/SDL_config.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
+set(config_install_dir "lib/cmake/${PROJECT_NAME}")
+set(include_install_dir "include")
+
+set(generated_dir "${CMAKE_CURRENT_BINARY_DIR}/generated")
+
+set(version_config "${generated_dir}/${PROJECT_NAME}ConfigVersion.cmake")
+set(project_config "${generated_dir}/${PROJECT_NAME}Config.cmake")
+set(TARGETS_EXPORT_NAME "${PROJECT_NAME}Targets")
+set(namespace "${PROJECT_NAME}::")
+
+include(CMakePackageConfigHelpers)
+
+# Use:
+#   * PROJECT_VERSION
+write_basic_package_version_file(
+    "${version_config}" COMPATIBILITY SameMajorVersion
+)
+
+# Use variables:
+#   * TARGETS_EXPORT_NAME
+#   * PROJECT_NAME
+configure_package_config_file(
+    "cmake/Config.cmake.in"
+    "${project_config}"
+    INSTALL_DESTINATION "${config_install_dir}"
+)
+
+install(
+    TARGETS SDL2 SDL2main
+    EXPORT "${TARGETS_EXPORT_NAME}"
+    LIBRARY DESTINATION "lib"
+    ARCHIVE DESTINATION "lib"
+    RUNTIME DESTINATION "bin"
+    INCLUDES DESTINATION "${include_install_dir}"
+)
+
+install(
+    DIRECTORY "include/"
+    DESTINATION "${include_install_dir}/${PROJECT_NAME}"
+    FILES_MATCHING PATTERN "*.h"
+)
+
+install(
+    FILES ${SDL2_BINARY_DIR}/include/generated/SDL_config.h
+    DESTINATION "${include_install_dir}/${PROJECT_NAME}"
+)
+
 # Install dependency for SDL_android_main.c
 if (ANDROID)
-  install_header_files (DIRECTORY src/main/android DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
-  install_header_files (FILES src/SDL_internal.h DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL)
-  install_header_files (DIRECTORY src/dynapi DESTINATION ${DEST_INCLUDE_DIR}/ThirdParty/SDL FILES_MATCHING PATTERN *.h)
+  install(
+      DIRECTORY src/main/android
+      DESTINATION ${include_install_dir}/${PROJECT_NAME}
+  )
+  install(
+      FILES src/SDL_internal.h
+      DESTINATION ${include_install_dir}/${PROJECT_NAME}
+  )
+  install(
+      DIRECTORY src/dynapi
+      DESTINATION ${include_install_dir}/${PROJECT_NAME}
+      FILES_MATCHING PATTERN "*.h"
+  )
 endif ()
+
+install(
+    FILES "${project_config}" "${version_config}"
+    DESTINATION "${config_install_dir}"
+)
+
+install(
+    EXPORT "${TARGETS_EXPORT_NAME}"
+    NAMESPACE "${namespace}"
+    DESTINATION "${config_install_dir}"
+)
+
+# }
