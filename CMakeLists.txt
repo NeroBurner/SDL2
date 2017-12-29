@@ -1403,6 +1403,8 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/generated>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
 )
+find_package(Threads REQUIRED)
+target_link_libraries(SDL2 PUBLIC ${CMAKE_DL_LIBS} Threads::Threads)
 
 if(WIN32)
   set(SDLMAIN_SOURCES ${CMAKE_CURRENT_LIST_DIR}/src/main/windows/SDL_windows_main.c)
