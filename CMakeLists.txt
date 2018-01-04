@@ -888,11 +888,11 @@ elseif(HAIKU)
     endif(SDL_TIMERS)
 
     if(VIDEO_OPENGL)
-      # TODO: Use FIND_PACKAGE(OpenGL) instead
+      find_package(OpenGL REQUIRED)
       set(SDL_VIDEO_OPENGL 1)
       set(SDL_VIDEO_OPENGL_BGL 1)
       set(SDL_VIDEO_RENDER_OGL 1)
-      list(APPEND EXTRA_LIBS GL)
+      list(APPEND EXTRA_LIBS OpenGL::GL)
       set(HAVE_VIDEO_OPENGL TRUE)
     endif()
 
