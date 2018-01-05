@@ -1403,6 +1403,13 @@ target_include_directories(
     $<BUILD_INTERFACE:${CMAKE_CURRENT_BINARY_DIR}/include/generated>
     $<BUILD_INTERFACE:${CMAKE_CURRENT_LIST_DIR}/include>
 )
+
+set_target_properties(
+    SDL2
+    PROPERTIES
+    XCODE_ATTRIBUTE_CLANG_ENABLE_OBJC_ARC YES
+)
+
 find_package(Threads REQUIRED)
 target_link_libraries(SDL2 PUBLIC ${EXTRA_LIBS} ${CMAKE_DL_LIBS} Threads::Threads)
 
