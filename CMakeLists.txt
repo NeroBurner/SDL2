@@ -801,7 +801,7 @@ elseif(APPLE)
     find_package(corevideo REQUIRED)
     list(APPEND EXTRA_LIBS corevideo::corevideo)
   endif()
-  if(SDL_FRAMEWORK_COCOA)
+  if(SDL_FRAMEWORK_COCOA AND NOT IOS)
     find_package(foundation REQUIRED)
     list(APPEND EXTRA_LIBS foundation::foundation)
 
@@ -827,9 +827,38 @@ elseif(APPLE)
     find_package(coreaudio REQUIRED)
     list(APPEND EXTRA_LIBS coreaudio::coreaudio)
   endif()
-  if(SDL_FRAMEWORK_AUDIOUNIT)
+  if(SDL_FRAMEWORK_AUDIOUNIT AND NOT IOS)
     find_package(audiounit REQUIRED)
     list(APPEND EXTRA_LIBS audiounit::audiounit)
+  endif()
+
+  if(IOS)
+    find_package(audiotoolbox REQUIRED)
+    list(APPEND EXTRA_LIBS audiotoolbox::audiotoolbox)
+
+    find_package(corefoundation REQUIRED)
+    list(APPEND EXTRA_LIBS corefoundation::corefoundation)
+
+    find_package(uikit REQUIRED)
+    list(APPEND EXTRA_LIBS uikit::uikit)
+
+    find_package(gamecontroller REQUIRED)
+    list(APPEND EXTRA_LIBS gamecontroller::gamecontroller)
+
+    find_package(foundation REQUIRED)
+    list(APPEND EXTRA_LIBS foundation::foundation)
+
+    find_package(opengles REQUIRED)
+    list(APPEND EXTRA_LIBS opengles::opengles)
+
+    find_package(coremotion REQUIRED)
+    list(APPEND EXTRA_LIBS coremotion::coremotion)
+
+    find_package(coregraphics REQUIRED)
+    list(APPEND EXTRA_LIBS coregraphics::coregraphics)
+
+    find_package(quartzcore REQUIRED)
+    list(APPEND EXTRA_LIBS quartzcore::quartzcore)
   endif()
 
   # Urho3d - bug fix - make it work for iOS platform
